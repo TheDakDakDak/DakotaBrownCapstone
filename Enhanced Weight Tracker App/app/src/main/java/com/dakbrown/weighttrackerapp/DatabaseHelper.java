@@ -72,7 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEIGHTS);
         onCreate(db);
     }
-
+    //For use in Create Account for adding a new user.
     public long addUser(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -82,7 +82,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return newRowId;
     }
-
+    //For use in GridActivity for adding a weight to the list.
     public void addWeightEntry(int userId, String date, int weight) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -92,15 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_WEIGHTS, null, values);
         db.close();
     }
-
-    public void deleteWeightEntry(int userId, String date) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String where = COLUMN_USER_ID + "=? AND " + COLUMN_DATE + "=?";
-        String[] whereArgs = {String.valueOf(userId), date};
-        db.delete(TABLE_WEIGHTS, where, whereArgs);
-        db.close();
-    }
-
+    //For use in GridActivity to get the list of weights from the database.
     public Cursor getWeightsByUserId(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {COLUMN_DATE, COLUMN_WEIGHT};
@@ -108,7 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {String.valueOf(userId)};
         return db.query(TABLE_WEIGHTS, columns, selection, selectionArgs, null, null, COLUMN_DATE + " DESC");
     }
-
+    //For use in MainActivity to make sure the login credentials are correct.
     public int checkUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {COLUMN_ID};
@@ -124,17 +116,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return -1;
     }
-
-    public void updateWeightInDatabase(int userId, String date, int newWeight) {
+    //For use in GridActivity to delete all weight entries.
+    public void deleteAllWeightEntries(int userId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_WEIGHT, newWeight);
-        String where = COLUMN_USER_ID + "=? AND " + COLUMN_DATE + "=?";
-        String[] whereArgs = {String.valueOf(userId), date};
-        db.update(TABLE_WEIGHTS, values, where, whereArgs);
+        String where = COLUMN_USER_ID + "=?";
+        String[] whereArgs = {String.valueOf(userId)};
+        db.delete(TABLE_WEIGHTS, where, whereArgs);
         db.close();
     }
-
+    //For use in GridActivity to change the goal weight.
     public void updateGoalWeight(int userId, int goalWeight) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -148,7 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.insert(TABLE_GOALS, null, values);
         }
     }
-
+    //For use in GridActivity to get the goal ID from the database.
     private int getGoalId(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_GOALS, new String[] {COLUMN_ID}, COLUMN_USER_ID + "=?", new String[] {String.valueOf(userId)}, null, null, null);
@@ -159,7 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return -1;
     }
-
+    //For use in GridActivity to get the goal weight by user ID.
     public int getGoalWeightByUserId(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -183,7 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return goalWeight;
     }
-
+    //For use in UserProfile to update their information.
     public void updateUserProfile(int userId, String preferredName, int age, int height, String gender) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -196,7 +186,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.update(TABLE_USERS, values, where, whereArgs);
         db.close();
     }
-
+    //For use in WeightLossCalculator to fill in the user's data for them.
     public Cursor getUserProfile(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {COLUMN_PREFERRED_NAME, COLUMN_AGE, COLUMN_HEIGHT, COLUMN_GENDER};
@@ -204,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {String.valueOf(userId)};
         return db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
     }
-
+    //For use in GridActivity to calculate the change in weight from the last entry.
     public int getMostRecentWeight(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {COLUMN_WEIGHT};

@@ -93,5 +93,16 @@
             android:layout_height="wrap_content"
             android:columnCount="2">
         </TableLayout>
+
+        <Button
+            android:id="@+id/deleteAllWeights"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete All Weights"
+            android:textSize="20sp"
+            android:backgroundTint="@color/deletebuttoncolor"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"/>
     </LinearLayout>
 </ScrollView>

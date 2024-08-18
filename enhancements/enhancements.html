@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhancements</title>
+    <title>Enhanced Artifact</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
      <header>
-        <h1>Dakota Brown's ePortfolio</h1>
+        <h1>Enhanced Artifact</h1>
     </header>
     <nav>
         <ul>
@@ -20,7 +20,13 @@
     </nav>
 	<section id="about">
 		<h2>The Enhanced Application</h2>
-		<p>You can view the <a href="https://github.com/TheDakDakDak/DakotaBrownCapstone/tree/main/Pre_Enhancement_App_Code" target="_blank">pre-enhanced code files</a> on GitHub.</p>
+		<p>You can view the <a href="https://github.com/TheDakDakDak/DakotaBrownCapstone/tree/main/Enhanced%20Weight%20Tracker%20App" target="_blank">full enhanced project</a> on GitHub. It contains all of the necessary files to run it yourself on AndroidStudio.</p>
+		<h3>Enhancement 1: Software Design and Engineering</h3>
+		<p>The purpose of <a href="../images/weightlist.png" target="_blank">this</a> enhancement was to bring a little bit more life to the main weights page, as well as provide a bit more useful information to the user. The original artifact showed only the user's weight entry as well as the date that it was entered. With this enhanced version, it also includes the change in weight since the last entry, as well as the number of pounds away the user still is from their goal weight. This was accomplished by adding two extra columns to the activity's xml file and then calculating and adding the values in each entry in GridActivity's loadWeightEntries method, which is assisted by databasehelper.</p>
+		<h3>Enhancement 2: Algorithms and Data Structures</h3>
+		<p><a href="../images/weightlosscalculator.png" target="_blank">This</a> was my personal favorite enhancement as it added a lot of value by adding a brand new, and useful bit of functionality to the app. The Weight Loss Calculator. It asks the user for several pieces of information such as their weight, height, gender, age, and activity level, and implements the Mifflin-St. Jeor formula to calculate their total daily energy expenditure (TDEE). Their TDEE is the total number of calories they burn per day. The user also enters how much weight they'd like to lose and how fast they'd like to lose the weight, and then this new calculation takes into account their TDEE and informs them of the maximum calories they can eat each day if they'd like to lose the given weight in the given amount of time. The algorithm also notifies them if their weight loss goal is too ambitious to the point of being unsafe. For this enhancement, the calculator had only standalone functionality and did not interact with the database at all as it relied only on the user's input. This was changed slightly in Enhancement 3. </p>
+		<h3>Enhancement 3: Databases</h3>
+		<p>This enhancement builds upon the last one in that it adds functionality to the weight loss calculator. First, I set up an activity for the user to update their <a href="../images/updateprofile.png" target="_blank">user profile</a>. This involved adding a few things to the database: the user's preferred name, their height, age, and gender. Once entered, they're stored in a new table for use in the weight loss calculator. Then when the user clicks on the Weight Loss Calculator, these pieces of information that they added to their profile are pulled from the database and <a href="../images/prepopulatedwlc.png" target="_blank">prepopulated</a> into their corresponding fields so that the user doesn't need to enter them. It also pulls their most current weight entry (which we already had in the database prior to this enhancement) to populate that field. The fields are still however editable in case the user wants to enter the information for someone else, or just wants to play around with the calculator. </p>
 	</section>
     <footer>
         <p>© 2024 Dakota Brown's ePortfolio</p>

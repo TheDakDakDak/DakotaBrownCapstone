@@ -2,4 +2,5 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+        <color name="deletebuttoncolor">#FF4444</color> <!-- Define holo_red_light -->
 </resources>

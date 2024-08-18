@@ -41,6 +41,7 @@ public class GridActivity extends AppCompatActivity {
         Button updateGoalWeightButton = findViewById(R.id.goalWeight);
         Button toProfileButton = findViewById(R.id.toProfile);
         Button weightLossCalculatorButton = findViewById(R.id.weightLossCalc);
+        Button deleteAllWeightsButton = findViewById(R.id.deleteAllWeights);
         tableLayout = findViewById(R.id.dataTable);
         loadWeightEntries();
         addWeightButton.setOnClickListener(v -> openAddWeightDialog());
@@ -55,8 +56,20 @@ public class GridActivity extends AppCompatActivity {
             intent.putExtra("USER_ID", currentUserId);
             startActivity(intent);
         });
+        deleteAllWeightsButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete All Weights")
+                    .setMessage("This will permanently delete all weight entries. Continue?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        dbHelper.deleteAllWeightEntries(currentUserId);
+                        loadWeightEntries(); // Refresh the table after deletion
+                        Toast.makeText(GridActivity.this, "All weight entries deleted.", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
     }
-
+    //Opens the dialog box for a user to add a weight entry.
     private void openAddWeightDialog() {
         final EditText input = new EditText(this);
         input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -74,7 +87,7 @@ public class GridActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.cancel())
                 .show();
     }
-
+    //Opens the dialog box for a user to change their goal weight.
     private void openUpdateGoalDialog() {
         final EditText input = new EditText(this);
         input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -93,19 +106,20 @@ public class GridActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.cancel())
                 .show();
     }
-
+    //Called by openAddWeightDialog to get their weight and insert it into the database.
     private void addWeightEntryToDatabase(String date, int weight) {
         dbHelper.addWeightEntry(currentUserId, date, weight);
         checkAndNotifyGoalWeight(currentUserId, weight);
         loadWeightEntries();
         Toast.makeText(this, "Weight added successfully!", Toast.LENGTH_SHORT).show();
     }
-
+    //Loads the list of weights.
     private void loadWeightEntries() {
         Cursor cursor = dbHelper.getWeightsByUserId(currentUserId);
         tableLayout.removeAllViews();
         Integer previousWeight = null;
         int goalWeight = dbHelper.getGoalWeightByUserId(currentUserId);
+
         while (cursor.moveToNext()) {
             String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DATE));
             int weight = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_WEIGHT));
@@ -114,7 +128,7 @@ public class GridActivity extends AppCompatActivity {
         }
         cursor.close();
     }
-
+    //Adds a new row to the list of weights when a user adds a weight.
     private void addRowToTable(String date, int weight, Integer previousWeight, int goalWeight) {
         final TableRow row = new TableRow(this);
         row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
@@ -122,27 +136,17 @@ public class GridActivity extends AppCompatActivity {
         TextView dateView = new TextView(this);
         dateView.setText(date);
         dateView.setTextSize(14);
-        dateView.setPadding(16,16,16,16);
+        dateView.setPadding(16, 16, 16, 16);
         TableRow.LayoutParams paramsDate = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
         dateView.setLayoutParams(paramsDate);
 
-        final EditText weightEdit = new EditText(this);
-        weightEdit.setId(View.generateViewId());
-        weightEdit.setText(String.valueOf(weight));
-        weightEdit.setTextSize(20);
-        weightEdit.setPadding(16,16,16,16);
+        // Replace EditText with TextView for weight
+        TextView weightView = new TextView(this);
+        weightView.setText(String.valueOf(weight));
+        weightView.setTextSize(20);
+        weightView.setPadding(16, 16, 16, 16);
         TableRow.LayoutParams paramsWeight = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
-        weightEdit.setLayoutParams(paramsWeight);
-        weightEdit.setInputType(InputType.TYPE_CLASS_NUMBER);
-        weightEdit.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                int newWeight = Integer.parseInt(weightEdit.getText().toString());
-                dbHelper.updateWeightInDatabase(currentUserId, date, newWeight);
-                loadWeightEntries();
-                return true;
-            }
-            return false;
-        });
+        weightView.setLayoutParams(paramsWeight);
 
         TextView changeView = new TextView(this);
         if (previousWeight != null) {
@@ -176,34 +180,34 @@ public class GridActivity extends AppCompatActivity {
         TableRow.LayoutParams paramsGoal = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
         goalView.setLayoutParams(paramsGoal);
 
-
-
         row.addView(dateView);
-        row.addView(weightEdit);
+        row.addView(weightView);
         row.addView(changeView);
         row.addView(goalView);
 
         tableLayout.addView(row);
     }
-
+    //Used to show the weight in the weight list.
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return sdf.format(new Date());
     }
-
+    //Called by addWeightEntryToDatabase if the goal weight is entered as current weight.
     private void checkAndNotifyGoalWeight(int userId, int newWeight) {
         int goalWeight = dbHelper.getGoalWeightByUserId(userId);
         if (newWeight == goalWeight) {
-            sendSmsNotification();
+            showGoalReachedDialog();
         }
     }
-
-    private void sendSmsNotification() {
-        String phoneNumber = "5555555555";
-        String message = "Congratulations! You've reached your goal weight!";
-
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+    //Called by checkAndNotifyGoalWeight to display the congratulatory message.
+    private void showGoalReachedDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Goal Reached!")
+                .setMessage("Congratulations! You've reached your goal weight!")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Any additional actions can be handled here
+                })
+                .show();
     }
 
 
